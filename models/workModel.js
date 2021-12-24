@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 
 const workSchema = new mongoose.Schema({
-    where: {
+    customer: String,
+    from: {
         type: String,
         required: true
     },
@@ -17,13 +18,10 @@ const workSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    customer: String,
     price: {
         type: Number,
         default: 0
-    },
-    trucks: [{
-        type: mongoose.Schema.ObjectId,
-        ref: "Truck"
-    }]
+    }
 })
+
+module.exports = mongoose.model("Work", workSchema);
