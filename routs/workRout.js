@@ -2,10 +2,10 @@ const express = require("express");
 const { createWork } = require("../controllers/workController");
 const { addWorkToCalendar } = require("../controllers/calendarController")
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
+
 
 router
-    .route("/create")
-        .post(createWork, addWorkToCalendar)
+    .post("/month/:month/date/:date/truck/:truck", [createWork, addWorkToCalendar]);
 
 module.exports = router;

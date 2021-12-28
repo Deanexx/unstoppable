@@ -5,9 +5,8 @@ const workModel = require("../models/workModel");
 
 exports.createWork = async ({ body }, res, next) => {
     const { work } = body;
-    console.log(work);
-    const { _id } = await workModel.create(work);
+    const newWork = await workModel.create(work);
 
-    res.locals.workID = _id;
+    res.locals.work = newWork;
     next();
 }

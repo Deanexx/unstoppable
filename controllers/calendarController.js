@@ -1,4 +1,4 @@
-const monthModel = require("./../models/monthModel");
+const calendarModel = require("./../models/monthModel");
 
 /*
 
@@ -7,12 +7,21 @@ const monthModel = require("./../models/monthModel");
 
 */
 
+exports.getCalendar = async (req, res, next) => {
+    const calendar = await calendarModel
+        .find({})
+            .sort([["year", -1], ["month", -1]])
+                .limit(4);
+
+    res.status(200).json(calendar);
+}
+
 exports.pushMonth = async ({ trucksDB }, res, next) => {
     const DateObj = new Date();
-    const lastMonth = await monthModel
+    const lastMonth = await calendarModel
         .find({})
-        .sort([["year", -1], ["month", -1]])
-        .limit(1); // get the last month
+            .sort([["year", -1], ["month", -1]])
+                .limit(1); // get the last month
     let month = lastMonth[0] ? lastMonth[0].month + 1 : DateObj.getMonth() + 1;
     let year = lastMonth[0] ? lastMonth[0].year : DateObj.getFullYear();
     
@@ -35,7 +44,7 @@ exports.pushMonth = async ({ trucksDB }, res, next) => {
         dates.push({ date, weekDate, trucks })
     }
 
-    const newMonth = await monthModel.create({
+    const newMonth = await calendarModel.create({
         year,
         month,
         dates
@@ -43,9 +52,26 @@ exports.pushMonth = async ({ trucksDB }, res, next) => {
     return res.status(201).json(newMonth)
 }
 
-// /year/:year/month/:month/date/:date
+// month/:month/date/:date/truck/:truck
 
 exports.addWorkToCalendar = async (req, res, next) => { 
-    console.log(res.locals);
-    res.sendStatus(200)
-} 
+    const { month, date, truck } = req.params;
+    const { work } = res.locals
+
+    console.log(month, date, truck, work)
+    if (!month || !date || !truck || !work) 
+        throw new Error("No valid data");
+
+    const monthDB = await calendarModel.findOne({ _id : month });
+    const trucks = monthDB.dates[date - 1].trucks; // dangeros, if got time do a binary search
+    for (let i = 0; i < trucks.length; i++) {
+        if (trucks[i].truck.toString() === truck)
+            trucks[i].work.push(work._id);
+    }
+
+    monthDB.save();
+    
+    res
+        .status(201)
+            .json(work);
+}
