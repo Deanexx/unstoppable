@@ -1,7 +1,9 @@
 const mongoose = require("mongoose");
 
 const workSchema = new mongoose.Schema({
-    customer: String,
+    customerName: String,
+    customerPhoneNumber: String,
+    customerEmail: String,
     from: {
         type: String,
         required: true
@@ -14,6 +16,10 @@ const workSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    longWalk: {
+        type: Boolean,
+        default: false
+    },
     stairs: {
         type: Boolean,
         default: false
@@ -21,6 +27,9 @@ const workSchema = new mongoose.Schema({
     price: {
         type: Number,
         default: 0
+    },
+    note: {
+        type: String
     }
 })
 
